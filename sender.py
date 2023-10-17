@@ -11,7 +11,7 @@ def readFile(filename, length):
     return arr
 
 def receiveRequest(serversocket):
-    data, addr = serversocket.recvfrom(MAX_BYTES)
+    data, address = serversocket.recvfrom(6000)
     request = struct.unpack_from("!cII",data)
     length = request[2]
     fileName = struct.unpack_from(f"!{length}s",data,offset=9)[0].decode('utf-8')
