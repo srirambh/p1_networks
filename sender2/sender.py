@@ -41,30 +41,38 @@ if __name__ == "__main__":
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         for i in range(0, len(byteArr), args.length):
             packet = byteArr[i:min(i+args.length, len(byteArr))]
-            sock.sendto(struct.pack(f"!cII{len(bytes)}s", b'D', args.seq_no, len(byteArr), byteArr), (address, args.port))
+            temp = struct.pack(f"!cII{len(packet)}s", b'D', args.seq_no, len(packet), packet)
+            sock.sendto(temp, (address[0], args.requester_port))
 
-            print("Time packet was sent: ", datetime.utcnow())
-            print("Requester IP: ", address)
-            print("Sequence num: ", args.seq_no)
-            print("Payload: ", packet.decode('utf-8')[:min(len(packet), 4)]) # in case packet len < 4
+            print("DATA packet")
+            print("send time: ", datetime.utcnow())
+            print("requester addr: ", str(address[0]) + ":" + str(args.requester_port))
+            print("sequence: ", args.seq_no)
+            print("length: ", len(packet))
+            print("payload: ", packet.decode('utf-8')[:min(len(packet), 4)]) # in case packet len < 4
             print()
             args.seq_no += len(packet)
             time.sleep(1.0 / args.rate)
 
-        sock.sendto(struct.pack(f"!cII",b'E',0,0), (address, args.port))
+        sock.sendto(struct.pack(f"!cII",b'E', args.seq_no, 0), (address[0], args.requester_port))
 
-        print("Time end packet was sent: ", datetime.utcnow())
-        print("Requester IP: ", address)
-        print("Sequence num: ", args.seq_no)
-        print("Payload: ", packet.decode('utf-8')[:min(len(packet), 4)]) # in case packet len < 4
+        print("END packet")
+        print("send time: ", datetime.utcnow())
+        print("requester addr: ", str(address[0]) + ":" + str(args.requester_port))
+        print("sequence: ", args.seq_no)
+        print("length: 0")
+        print("payload: ", )
 
     except: # in case the file does not exist with the sender
 
         sock.sendto(struct.pack(f"!cII",b'E',0,0), (address, args.port))
-        print("Time end packet was sent: ", datetime.utcnow())
-        print("Requester IP: ", address)
-        print("Sequence num: ", args.seq_no)
-        print("Payload: ", packet.decode('utf-8')[:min(len(packet), 4)]) # in case packet len < 4
+
+        print("END packet")
+        print("send time: ", datetime.utcnow())
+        print("requester addr: ", address)
+        print("sequence: ", args.seq_no)
+        print("length: 0")
+        print("payload: ", packet.decode('utf-8')[:min(len(packet), 4)]) # in case packet len < 4
 
     server.close()
 
